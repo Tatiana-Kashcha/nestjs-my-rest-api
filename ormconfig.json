@@ -1,0 +1,6 @@
+{
+  "type": "sqlite",
+  "database": "phone_book.sqlite",
+  "entities": ["dist/**/*.entity.js"],
+  "synchronize": true
+}

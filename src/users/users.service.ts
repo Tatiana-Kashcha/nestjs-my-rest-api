@@ -59,6 +59,7 @@ export class UsersService {
     }
   }
 
+  // функції, які використовуються в AuthService
   async findOne(name: string): Promise<User | null> {
     const options: FindOneOptions<User> = { where: { name } };
     const user = await this.usersRepository.findOne(options);
@@ -78,4 +79,45 @@ export class UsersService {
   async findById(id: number): Promise<User | null> {
     return this.usersRepository.findOne({ where: { id } });
   }
+
+  async isTokenValid(payload: any): Promise<boolean> {
+    const userExists = await this.usersRepository.findOne({
+      where: { id: payload.sub },
+    });
+
+    return userExists?.currentToken ? true : false;
+  }
+
+  // функції, які використовуються в UsersController
+  async findAll(): Promise<UserResponseDto[]> {
+    const users = await this.usersRepository.find();
+
+    return users.map(({ id, email, name, currentToken }) => ({
+      id,
+      email,
+      name,
+      currentToken,
+    }));
+  }
+
+  async findOneUserId(id: number): Promise<UserResponseDto | null> {
+    const options: FindOneOptions<User> = { where: { id } };
+    const user = await this.usersRepository.findOne(options);
+
+    if (!user) {
+      return null;
+    }
+    const { id: userId, name, email, currentToken } = user;
+    return { id: userId, name, email, currentToken };
+  }
+
+  async remove(id: number): Promise<void> {
+    await this.usersRepository.delete(id);
+  }
 }
+
+// складові токена - <Header>.<Payload>.<Signature>
+// приклади токенів
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInVzZXJuYW1lIjoiVmF2YSIsImVtYWlsIjoidmF2YUBnbWFpbC5jb20iLCJpYXQiOjE3NDkxNTI0NTMsImV4cCI6MTc0OTIzNTI1M30.kpLpq9LO59CvUJwI3bh8JPP7ipz5x9vUJ8dAjN2aCrU
+
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiVGF0YSIsImVtYWlsIjoidGF0YUBnbWFpbC5jb20iLCJpYXQiOjE3NDkxNTI1MTAsImV4cCI6MTc0OTIzNTMxMH0.PYxLydD1KoVc9O5u-NKrjUyzPU7amae6gHhMW1Y_t3Q

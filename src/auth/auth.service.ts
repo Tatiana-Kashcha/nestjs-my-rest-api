@@ -18,18 +18,6 @@ export class AuthService {
   }
 
   // для стратегії "local"
-  // async validateUser(
-  //   username: string,
-  //   pass: string,
-  // ): Promise<UserResponseDto | null> {
-  //   const user = await this.usersService.findOne(username);
-  //   if (user && user.password === pass) {
-  //     const { password, ...result } = user;
-  //     return result;
-  //   }
-  //   return null;
-  // }
-
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
     if (user && (await bcrypt.compare(password, user.password))) {
@@ -40,13 +28,6 @@ export class AuthService {
   }
 
   // для стратегії "jwt"
-  // async login(user: any) {
-  //   const payload = { username: user.name, sub: user.email };
-  //   return {
-  //     access_token: this.jwtService.sign(payload),
-  //   };
-  // }
-
   async login(user: any) {
     const payload = { sub: user.id, username: user.name, email: user.email };
     const accessToken = this.jwtService.sign(payload);

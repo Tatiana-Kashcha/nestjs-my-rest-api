@@ -59,6 +59,7 @@ export class UsersService {
     }
   }
 
+  // функції, які використовуються в AuthService
   async findOne(name: string): Promise<User | null> {
     const options: FindOneOptions<User> = { where: { name } };
     const user = await this.usersRepository.findOne(options);
@@ -85,6 +86,33 @@ export class UsersService {
     });
 
     return userExists?.currentToken ? true : false;
+  }
+
+  // функції, які використовуються в UsersController
+  async findAll(): Promise<UserResponseDto[]> {
+    const users = await this.usersRepository.find();
+
+    return users.map(({ id, email, name, currentToken }) => ({
+      id,
+      email,
+      name,
+      currentToken,
+    }));
+  }
+
+  async findOneUserId(id: number): Promise<UserResponseDto | null> {
+    const options: FindOneOptions<User> = { where: { id } };
+    const user = await this.usersRepository.findOne(options);
+
+    if (!user) {
+      return null;
+    }
+    const { id: userId, name, email, currentToken } = user;
+    return { id: userId, name, email, currentToken };
+  }
+
+  async remove(id: number): Promise<void> {
+    await this.usersRepository.delete(id);
   }
 }
 

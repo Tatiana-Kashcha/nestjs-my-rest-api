@@ -35,12 +35,6 @@ export class AuthController {
     return req.user;
   }
 
-  // @UseGuards(LocalAuthGuard) // для локальної стратегії
-  // @Post('logout')
-  // async logout(@Request() req) {
-  //   return req.logout();
-  // }
-
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(@Request() req) {
@@ -48,4 +42,11 @@ export class AuthController {
     await this.authService.logout(req.user.id);
     return { message: 'Logged out successfully' };
   }
+
+  // для локальної стратегії без використання jwt
+  // @UseGuards(LocalAuthGuard)
+  // @Post('logout')
+  // async logout(@Request() req) {
+  //   return req.logout();
+  // }
 }

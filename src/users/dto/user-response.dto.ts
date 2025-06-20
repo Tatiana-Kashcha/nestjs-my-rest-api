@@ -1,6 +1,10 @@
-export class UserResponseDto {
+class UserData {
   id: number;
   email: string;
   name: string;
-  currentToken: string;
+}
+
+export class UserResponseDto {
+  user: UserData;
+  token: string;
 }

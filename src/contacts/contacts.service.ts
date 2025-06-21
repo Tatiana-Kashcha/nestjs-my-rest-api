@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOneOptions } from 'typeorm';
 
@@ -52,7 +52,25 @@ export class ContactsService {
     return `This action updates a #${id} contact`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} contact`;
+  // Метод .delete(id) виконує DELETE і не перевіряє, чи існує об'єкт у базі даних.
+
+  // async remove(id: number): Promise<{ id: number }> {
+  //   await this.contactsRepository.delete(id);
+
+  //   return { id };
+  // }
+
+  // Замінимо на варіант з додаванням перевірки існування об'єкта у базі даних
+
+  async remove(id: number): Promise<{ id: number }> {
+    const contact = await this.contactsRepository.findOneBy({ id });
+
+    if (!contact) {
+      throw new NotFoundException(`Contact with id ${id} not found`);
+    }
+
+    await this.contactsRepository.delete(id);
+
+    return { id };
   }
 }

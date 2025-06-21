@@ -20,16 +20,16 @@ export class ContactsController {
   constructor(private readonly contactsService: ContactsService) {}
 
   @Post()
-  create(@Body() createContactDto: CreateContactDto, @Request() req) {
+  async create(@Body() createContactDto: CreateContactDto, @Request() req) {
     const userId = req.user.id;
 
-    return this.contactsService.create(createContactDto, userId);
+    return await this.contactsService.create(createContactDto, userId);
   }
 
   @Get()
-  findAll(@Request() req) {
+  async findAll(@Request() req) {
     const userId = req.user.id;
-    return this.contactsService.findAll(userId);
+    return await this.contactsService.findAll(userId);
   }
 
   @Get(':id')
@@ -43,7 +43,10 @@ export class ContactsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.contactsService.remove(+id);
+  async remove(@Param('id') id: string): Promise<{ id: number }> {
+    const numericId = +id;
+    await this.contactsService.remove(numericId);
+
+    return { id: numericId };
   }
 }

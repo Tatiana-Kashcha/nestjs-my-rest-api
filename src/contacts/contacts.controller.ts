@@ -8,10 +8,13 @@ import {
   Delete,
   Request,
   UseGuards,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ContactsService } from './contacts.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
+import { ContactResponseDto } from './dto/contact-response.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard)
@@ -33,16 +36,43 @@ export class ContactsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.contactsService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<ContactResponseDto | null> {
+    const parsedId = Number(id);
+
+    if (isNaN(parsedId)) {
+      throw new BadRequestException('ID must be a valid number');
+    }
+
+    const contact = await this.contactsService.findOne(parsedId);
+
+    if (!contact) {
+      throw new NotFoundException(`Contact with ID ${parsedId} not found`);
+    }
+
+    return contact;
   }
 
   @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() updateContactDto: UpdateContactDto,
-  ) {
-    return this.contactsService.update(+id, updateContactDto);
+  ): Promise<ContactResponseDto | null> {
+    const parsedId = Number(id);
+
+    if (isNaN(parsedId)) {
+      throw new BadRequestException('ID must be a valid number');
+    }
+
+    const contactUpdated = await this.contactsService.update(
+      parsedId,
+      updateContactDto,
+    );
+
+    if (!contactUpdated) {
+      throw new NotFoundException(`Contact with ID ${parsedId} not found`);
+    }
+
+    return contactUpdated;
   }
 
   @Delete(':id')

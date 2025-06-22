@@ -44,8 +44,9 @@ export class ContactsService {
     }));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} contact`;
+  async findOne(id: number): Promise<ContactResponseDto | null> {
+    const options: FindOneOptions<Contact> = { where: { id } };
+    return this.contactsRepository.findOne(options);
   }
 
   async update(
@@ -54,7 +55,6 @@ export class ContactsService {
   ): Promise<ContactResponseDto | null> {
     await this.contactsRepository.update(id, updateContactDto);
     const options: FindOneOptions<Contact> = { where: { id } };
-    console.log(this.contactsRepository.findOne(options));
 
     return this.contactsRepository.findOne(options);
   }

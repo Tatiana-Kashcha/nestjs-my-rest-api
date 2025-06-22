@@ -45,14 +45,18 @@ export class UsersService {
 
       // оновлюємо token у user
       await this.usersRepository.update(savedUser.id, {
-        currentToken: accessToken,
+        token: accessToken,
       });
 
-      return {
+      const user = {
         id: savedUser.id,
         name: savedUser.name,
         email: savedUser.email,
-        currentToken: accessToken,
+      };
+
+      return {
+        user,
+        token: accessToken,
       };
     } catch (error) {
       throw error;
@@ -72,8 +76,8 @@ export class UsersService {
     return user;
   }
 
-  async updateToken(userId: number, token: string) {
-    await this.usersRepository.update(userId, { currentToken: token });
+  async updateToken(userId: number, currentToken: string) {
+    await this.usersRepository.update(userId, { token: currentToken });
   }
 
   async findById(id: number): Promise<User | null> {
@@ -85,18 +89,16 @@ export class UsersService {
       where: { id: payload.sub },
     });
 
-    return userExists?.currentToken ? true : false;
+    return userExists?.token ? true : false;
   }
 
   // функції, які використовуються в UsersController
   async findAll(): Promise<UserResponseDto[]> {
     const users = await this.usersRepository.find();
 
-    return users.map(({ id, email, name, currentToken }) => ({
-      id,
-      email,
-      name,
-      currentToken,
+    return users.map(({ id, email, name, token }) => ({
+      user: { id, email, name },
+      token,
     }));
   }
 
@@ -107,8 +109,8 @@ export class UsersService {
     if (!user) {
       return null;
     }
-    const { id: userId, name, email, currentToken } = user;
-    return { id: userId, name, email, currentToken };
+    const { id: userId, name, email, token } = user;
+    return { user: { id: userId, name, email }, token };
   }
 
   async remove(id: number): Promise<void> {
@@ -117,7 +119,3 @@ export class UsersService {
 }
 
 // складові токена - <Header>.<Payload>.<Signature>
-// приклади токенів
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInVzZXJuYW1lIjoiVmF2YSIsImVtYWlsIjoidmF2YUBnbWFpbC5jb20iLCJpYXQiOjE3NDkxNTI0NTMsImV4cCI6MTc0OTIzNTI1M30.kpLpq9LO59CvUJwI3bh8JPP7ipz5x9vUJ8dAjN2aCrU
-
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiVGF0YSIsImVtYWlsIjoidGF0YUBnbWFpbC5jb20iLCJpYXQiOjE3NDkxNTI1MTAsImV4cCI6MTc0OTIzNTMxMH0.PYxLydD1KoVc9O5u-NKrjUyzPU7amae6gHhMW1Y_t3Q

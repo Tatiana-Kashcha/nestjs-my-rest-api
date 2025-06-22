@@ -28,13 +28,22 @@ export class AuthService {
   }
 
   // для стратегії "jwt"
-  async login(user: any) {
-    const payload = { sub: user.id, username: user.name, email: user.email };
+  async login(userData: any): Promise<UserResponseDto> {
+    const payload = {
+      sub: userData.id,
+      username: userData.name,
+      email: userData.email,
+    };
     const accessToken = this.jwtService.sign(payload);
 
-    await this.usersService.updateToken(user.id, accessToken);
+    await this.usersService.updateToken(userData.id, accessToken);
+    const user = {
+      id: userData.id,
+      name: userData.name,
+      email: userData.email,
+    };
 
-    return { currentToken: accessToken };
+    return { user, token: accessToken };
   }
 
   async logout(userId: number) {

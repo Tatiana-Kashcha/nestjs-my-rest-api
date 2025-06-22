@@ -18,5 +18,5 @@ export class User {
   createdAt: Date;
 
   @Column({ nullable: true })
-  currentToken: string;
+  token: string;
 }

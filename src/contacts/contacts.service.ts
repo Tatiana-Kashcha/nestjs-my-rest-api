@@ -48,8 +48,15 @@ export class ContactsService {
     return `This action returns a #${id} contact`;
   }
 
-  update(id: number, updateContactDto: UpdateContactDto) {
-    return `This action updates a #${id} contact`;
+  async update(
+    id: number,
+    updateContactDto: UpdateContactDto,
+  ): Promise<ContactResponseDto | null> {
+    await this.contactsRepository.update(id, updateContactDto);
+    const options: FindOneOptions<Contact> = { where: { id } };
+    console.log(this.contactsRepository.findOne(options));
+
+    return this.contactsRepository.findOne(options);
   }
 
   // Метод .delete(id) виконує DELETE і не перевіряє, чи існує об'єкт у базі даних.

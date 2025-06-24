@@ -23,7 +23,7 @@ export class ContactsService {
       owner: userId,
     });
     const savedContact = await this.contactsRepository.save(newContact);
-    console.log(savedContact);
+    // console.log(savedContact);
 
     return {
       id: savedContact.id,

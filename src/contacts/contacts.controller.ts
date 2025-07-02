@@ -16,7 +16,10 @@ import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 import { ContactResponseDto } from './dto/contact-response.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('Contacts') // Тег для Swagger UI
+@ApiBearerAuth() // JWT авторизація
 @UseGuards(JwtAuthGuard)
 @Controller('contacts')
 export class ContactsController {
